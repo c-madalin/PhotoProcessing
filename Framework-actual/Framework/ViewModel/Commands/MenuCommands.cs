@@ -515,6 +515,96 @@ namespace Framework.ViewModel
         }
         #endregion
 
+
+        #region Mirror image
+        private ICommand _mirrorImageCommand;
+        public ICommand MirrorImageCommand
+        {
+            get
+            {
+                if (_mirrorImageCommand == null)
+                    _mirrorImageCommand = new RelayCommand(MirrorImage);
+                return _mirrorImageCommand;
+            }
+        }
+
+        private void MirrorImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+
+            ClearProcessedCanvas(parameter as Canvas);
+
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.Mirror(GrayInitialImage);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = Tools.Mirror(ColorInitialImage);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+        #endregion
+
+        #region Binary image
+        private ICommand _binaryImageCommand;
+        public ICommand BinaryImageCommand
+        {
+            get
+            {
+                if (_binaryImageCommand == null)
+                    _binaryImageCommand = new RelayCommand(BinaryImage);
+                return _binaryImageCommand;
+            }
+        }
+
+        private void BinaryImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+
+            ClearProcessedCanvas(parameter as Canvas);
+
+            if (GrayInitialImage != null)
+            {
+                int threshold = 128;
+
+                List<string> label = new List<string>
+                    {
+                    "Threshhold (0-255)"
+                    };
+
+                DialogWindow dialog = new DialogWindow(_mainVM, label);
+                dialog.ShowDialog();
+
+                List<double> values = dialog.GetValues();
+
+                if (values[0] < 0 || values[0] > 255)
+                {
+                    MessageBox.Show("Please add a correct value!");
+                    return;
+                }
+
+                threshold = (int)values[0];
+                GrayProcessedImage = Tools.Binar2(GrayInitialImage, threshold);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+
+
+
+
+        }
+
+        #endregion
+
         #region Convert color image to grayscale image
         private ICommand _convertImageToGrayscaleCommand;
         public ICommand ConvertImageToGrayscaleCommand
