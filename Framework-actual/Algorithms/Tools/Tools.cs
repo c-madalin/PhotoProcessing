@@ -74,7 +74,7 @@ namespace Algorithms.Tools
 
         #endregion
 
-        #region Mirror Image
+        #region Mirror
         public static Image<Gray, byte> Mirror(Image<Gray, byte> inputImage)
         {
             Image<Gray, byte> result = new Image<Gray, byte>(inputImage.Size);
@@ -104,6 +104,73 @@ namespace Algorithms.Tools
             }
             return result;
         }
+        #endregion
+
+        #region Rotate
+
+        public static Image<Gray, byte> Rotate(Image<Gray, byte> inputImage,bool direction)
+        {   
+            int newWidth = inputImage.Height;
+            int newHeight = inputImage.Width;
+
+            // da frate inertim latimea cu lingimea
+
+
+            Image<Gray, byte> result = new Image<Gray, byte>(newHeight,newWidth);
+
+            for (int y = 0; y < inputImage.Height; ++y)
+            {
+                for (int x = 0; x < inputImage.Width; ++x)
+                {
+                    if(direction)
+                    {
+                        result.Data[x, newWidth - 1 - y, 0] = inputImage.Data[y, x, 0];
+                    }
+                    else
+                    {
+                        result.Data[newHeight - 1 - x, y, 0] = inputImage.Data[y, x, 0];
+                    }
+                }
+            }
+            return result;
+        }
+
+
+
+
+        public static Image<Bgr, byte> Rotate(Image<Bgr, byte> inputImage, bool direction)
+        {
+            int newWidth = inputImage.Height;
+            int newHeight = inputImage.Width;
+
+
+            Image<Bgr, byte> result = new Image<Bgr, byte>(newHeight,newWidth);
+
+            for (int y = 0; y < inputImage.Height; ++y)
+            {
+                for (int x = 0; x < inputImage.Width; ++x)
+                {
+                    if(direction)
+                    {
+                        result.Data[x, newWidth - 1 - y, 0] = inputImage.Data[y, x, 0];
+                        result.Data[x, newWidth - 1 - y, 1] = inputImage.Data[y, x, 1];
+                        result.Data[x, newWidth - 1 - y, 2] = inputImage.Data[y, x, 2];
+
+
+                    }
+                    else
+                    {
+                        result.Data[newHeight - 1 - x, y, 0] = inputImage.Data[y, x, 0];
+                        result.Data[newHeight - 1 - x, y, 1] = inputImage.Data[y, x, 1];
+                        result.Data[newHeight - 1 - x, y, 2] = inputImage.Data[y, x, 2];
+
+                    }
+                }
+            }
+            return result;
+        }
+
+
         #endregion
 
         #region Convert color image to grayscale image

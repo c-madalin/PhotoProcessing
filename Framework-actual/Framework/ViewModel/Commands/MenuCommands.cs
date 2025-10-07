@@ -602,6 +602,67 @@ namespace Framework.ViewModel
 
 
         }
+        #endregion
+
+        #region Rotate image
+        private ICommand _rotateImageCommand;
+        public ICommand RotateImageCommand
+        {
+            get
+            {
+                if (_rotateImageCommand == null)
+                    _rotateImageCommand = new RelayCommand(RotateImage);
+                return _rotateImageCommand;
+            }
+        }
+
+        private void RotateImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+
+            ClearProcessedCanvas(parameter as Canvas);
+
+            if (GrayInitialImage != null)
+            {
+                int threshold = 128;
+
+                List<string> label = new List<string>
+                    {
+                     "Rotation Direction (0 = Clockwise, 1 = Counterclockwise)"
+                    };
+
+                DialogWindow dialog = new DialogWindow(_mainVM, label);
+                dialog.ShowDialog();
+
+                List<double> values = dialog.GetValues();
+
+                if (values.Count ==0 )
+                {
+                    MessageBox.Show("Please add a correct value!");
+                    return;
+                }
+
+                int choice = (int)values[0];
+                
+                if(choice !=0 && choice !=1)
+                {
+                    MessageBox.Show("Please add a correct value!");
+                    return;
+                }
+
+
+                bool direction = choice == 0 ? true : false;
+
+                GrayProcessedImage = Tools.Rotate(GrayInitialImage, direction);
+
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+
+        }
 
         #endregion
 
