@@ -444,7 +444,7 @@ namespace Framework.ViewModel
         #endregion
 
         #endregion
-
+        
         #region Copy image
         private ICommand _copyImageCommand;
         public ICommand CopyImageCommand
@@ -514,7 +514,6 @@ namespace Framework.ViewModel
             }
         }
         #endregion
-
 
         #region Mirror image
         private ICommand _mirrorImageCommand;
@@ -661,6 +660,34 @@ namespace Framework.ViewModel
 
                 ProcessedImage = Convert(GrayProcessedImage);
             }
+
+        }
+
+        #endregion
+
+        #region Crop image
+        
+        private ICommand _cropImageCommand;
+        public ICommand CropImageCommand
+        {
+            get
+            {
+                if (_cropImageCommand == null)
+                    _cropImageCommand = new RelayCommand(CropImage);
+                return _cropImageCommand;
+            }
+        }
+
+        private void CropImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+
+            ClearProcessedCanvas(parameter as Canvas);
+
 
         }
 
