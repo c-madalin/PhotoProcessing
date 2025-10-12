@@ -713,6 +713,27 @@ namespace Framework.ViewModel
 
             ClearProcessedCanvas(parameter as Canvas);
 
+            if(MouseClickCollection.Count < 2)
+            {
+                MessageBox.Show("Please select an area first!");
+                return;
+            }
+
+            if(GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.Crop(GrayInitialImage);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if(ColorInitialImage != null)
+            {
+                ColorProcessedImage = Tools.Crop(ColorInitialImage);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+            else if(ColorInitialImage!= null)
+            {
+
+            }
+
 
         }
 

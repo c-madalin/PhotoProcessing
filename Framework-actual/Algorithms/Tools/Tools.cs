@@ -1,5 +1,6 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
+using OpenTK.Input;
 
 namespace Algorithms.Tools
 {
@@ -172,6 +173,33 @@ namespace Algorithms.Tools
         #endregion
 
         #region Crop
+
+        public static Image<Gray, byte> Crop(Image<Gray, byte> inputImage)
+        {
+            int newWidth = inputImage.Height;
+            int newHeight = inputImage.Width;
+
+
+            Image<Gray, byte> result = new Image<Gray, byte>(newHeight, newWidth);
+
+           
+
+
+
+            return result;
+        }
+        public static Image<Bgr, byte> Crop(Image<Bgr, byte> inputImage)
+        {
+            int newWidth = inputImage.Height;
+            int newHeight = inputImage.Width;
+
+            Image<Bgr, byte> result = new Image<Bgr, byte>(newWidth, newHeight);
+
+
+            
+
+            return result;
+        }
 
         #endregion
 
