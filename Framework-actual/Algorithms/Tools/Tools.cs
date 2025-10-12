@@ -142,34 +142,32 @@ namespace Algorithms.Tools
 
         public static Image<Bgr, byte> Rotate(Image<Bgr, byte> inputImage, bool direction)
         {
-            int newWidth = inputImage.Height;
-            int newHeight = inputImage.Width;
+            int newWidth = inputImage.Height; 
+            int newHeight = inputImage.Width; 
+
+            Image<Bgr, byte> result = new Image<Bgr, byte>(newWidth, newHeight);
 
 
-            Image<Bgr, byte> result = new Image<Bgr, byte>(newHeight,newWidth);
-
-            for (int y = 0; y < inputImage.Height; ++y)
+            for (int y = 0; y < inputImage.Height; ++y) 
             {
                 for (int x = 0; x < inputImage.Width; ++x)
                 {
-                    if(direction)
+                    if (direction) 
                     {
-                        result.Data[x, newWidth - 1 - y, 0] = inputImage.Data[x, y, 0];
-                        result.Data[x, newWidth - 1 - y, 1] = inputImage.Data[x, y, 1];
-                        result.Data[x, newWidth - 1 - y, 2] = inputImage.Data[x, y, 2];
+                        result.Data[x, newWidth - 1 - y, 0] = inputImage.Data[y, x, 0];
+                        result.Data[x, newWidth - 1 - y, 1] = inputImage.Data[y, x, 1];
+                        result.Data[x, newWidth - 1 - y, 2] = inputImage.Data[y, x, 2];
                     }
                     else
                     {
-                        result.Data[newHeight - 1 - x, y, 0] = inputImage.Data[x, y, 0];
-                        result.Data[newHeight - 1 - x, y, 1] = inputImage.Data[x, y, 1];
-                        result.Data[newHeight - 1 - x, y, 2] = inputImage.Data[x, y, 2];
-
+                        result.Data[newHeight - 1 - x, y, 0] = inputImage.Data[y, x, 0];
+                        result.Data[newHeight - 1 - x, y, 1] = inputImage.Data[y, x, 1];
+                        result.Data[newHeight - 1 - x, y, 2] = inputImage.Data[y, x, 2];
                     }
                 }
             }
             return result;
         }
-
 
         #endregion
 
