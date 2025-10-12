@@ -97,9 +97,11 @@ namespace Algorithms.Tools
             {
                 for (int x = 0; x < inputImage.Width; ++x)
                 {
-                    result.Data[y, x, 0] = inputImage.Data[y, inputImage.Width - 1 - x, 0];
-                    result.Data[y, x, 1] = inputImage.Data[y, inputImage.Width - 1 - x, 0];
-                    result.Data[y, x, 2] = inputImage.Data[y, inputImage.Width - 1 - x, 0];
+                    int mirroredX = inputImage.Width - 1 - x; 
+
+                    result.Data[y, x, 0] = inputImage.Data[y, mirroredX, 0];
+                    result.Data[y, x, 1] = inputImage.Data[y, mirroredX, 1];
+                    result.Data[y, x, 2] = inputImage.Data[y, mirroredX, 2];
                 }
             }
             return result;
@@ -152,17 +154,15 @@ namespace Algorithms.Tools
                 {
                     if(direction)
                     {
-                        result.Data[x, newWidth - 1 - y, 0] = inputImage.Data[y, x, 0];
-                        result.Data[x, newWidth - 1 - y, 1] = inputImage.Data[y, x, 1];
-                        result.Data[x, newWidth - 1 - y, 2] = inputImage.Data[y, x, 2];
-
-
+                        result.Data[x, newWidth - 1 - y, 0] = inputImage.Data[x, y, 0];
+                        result.Data[x, newWidth - 1 - y, 1] = inputImage.Data[x, y, 1];
+                        result.Data[x, newWidth - 1 - y, 2] = inputImage.Data[x, y, 2];
                     }
                     else
                     {
-                        result.Data[newHeight - 1 - x, y, 0] = inputImage.Data[y, x, 0];
-                        result.Data[newHeight - 1 - x, y, 1] = inputImage.Data[y, x, 1];
-                        result.Data[newHeight - 1 - x, y, 2] = inputImage.Data[y, x, 2];
+                        result.Data[newHeight - 1 - x, y, 0] = inputImage.Data[x, y, 0];
+                        result.Data[newHeight - 1 - x, y, 1] = inputImage.Data[x, y, 1];
+                        result.Data[newHeight - 1 - x, y, 2] = inputImage.Data[x, y, 2];
 
                     }
                 }

@@ -627,7 +627,6 @@ namespace Framework.ViewModel
 
             if (GrayInitialImage != null)
             {
-                int threshold = 128;
 
                 List<string> label = new List<string>
                     {
@@ -639,15 +638,15 @@ namespace Framework.ViewModel
 
                 List<double> values = dialog.GetValues();
 
-                if (values.Count ==0 )
+                if (values.Count == 0)
                 {
                     MessageBox.Show("Please add a correct value!");
                     return;
                 }
 
                 int choice = (int)values[0];
-                
-                if(choice !=0 && choice !=1)
+
+                if (choice != 0 && choice != 1)
                 {
                     MessageBox.Show("Please add a correct value!");
                     return;
@@ -660,7 +659,33 @@ namespace Framework.ViewModel
 
                 ProcessedImage = Convert(GrayProcessedImage);
             }
+            else if (ColorInitialImage != null)
+            {
+                List<string> label = new List<string>
+                    {
+                     "Rotation Direction (0 = Clockwise, 1 = Counterclockwise)"
+                    };
+                DialogWindow dialog = new DialogWindow(_mainVM, label);
+                dialog.ShowDialog();
+                List<double> values = dialog.GetValues();
+                if (values.Count == 0)
+                {
+                    MessageBox.Show("Please add a correct value!");
+                    return;
+                }
+                int choice = (int)values[0];
+                if (choice != 0 && choice != 1)
+                {
+                    MessageBox.Show("Please add a correct value!");
+                    return;
+                }
 
+                bool direction = choice == 0 ? true : false;
+
+                ColorProcessedImage = Tools.Rotate(ColorInitialImage, direction);
+                ProcessedImage = Convert(ColorProcessedImage);
+
+            }
         }
 
         #endregion

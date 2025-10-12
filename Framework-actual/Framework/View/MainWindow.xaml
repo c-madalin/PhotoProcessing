@@ -178,6 +178,8 @@
                          Foreground="#1E1E1E"
                          Command="{Binding Path=MenuCommands.RotateImageCommand}"
                          CommandParameter="{Binding ElementName=processedImageCanvas}"/>
+                
+                
 
 
 
