@@ -171,6 +171,11 @@ namespace Algorithms.Tools
 
         #endregion
 
+        #region Crop
+
+        #endregion
+
+
         #region Convert color image to grayscale image
         public static Image<Gray, byte> Convert(Image<Bgr, byte> inputImage)
         {
