@@ -1,6 +1,7 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
 using OpenTK.Input;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
@@ -197,9 +198,6 @@ namespace Algorithms.Tools
                 }
             }
 
-
-
-
             return result;
         }
         public static Image<Bgr, byte> Crop(Image<Bgr, byte> inputImage, int StangaSusX, int StangaSusY, int DreaptaJosX, int DreaptaJosY)
@@ -225,6 +223,89 @@ namespace Algorithms.Tools
 
         #endregion
 
+        #region Get Stats
+        public static (double Mean, double StdDev) GetStats(Image<Gray, byte> inputImage)
+        {
+            if (inputImage == null) return (0.0, 0.0);
+
+            int width = inputImage.Width;
+            int height = inputImage.Height;
+            long totalPixels = (long)width * height;
+            if (totalPixels == 0) return (0.0, 0.0);
+
+            double sum = 0.0;
+
+            for (int y = 0; y < height; ++y)
+            {
+                for (int x = 0; x < width; ++x)
+                {
+                    sum += inputImage.Data[y, x, 0];
+                }
+            }
+
+            double mean = sum / totalPixels;
+
+            double sumOfSquaredDifferences = 0.0;
+
+            for (int y = 0; y < height; ++y)
+            {
+                for (int x = 0; x < width; ++x)
+                {
+                    double pixelValue = inputImage.Data[y, x, 0];
+                    double difference = pixelValue - mean;
+                    sumOfSquaredDifferences += difference * difference;
+                }
+            }
+
+            double stdDev = Math.Sqrt(sumOfSquaredDifferences / totalPixels);
+
+            return (mean, stdDev);
+        }
+        public static (double Mean, double StdDev) GetStats(Image<Bgr, byte> inputImage)
+        {
+            if (inputImage == null) return (0.0, 0.0);
+
+            int width = inputImage.Width;
+            int height = inputImage.Height;
+            long totalPixels = (long)width * height;
+            if (totalPixels == 0) return (0.0, 0.0);
+
+            double sumOfPixelAverages = 0.0;
+
+            for (int y = 0; y < height; ++y)
+            {
+                for (int x = 0; x < width; ++x)
+                {
+                    double avgPixelValue = (inputImage.Data[y, x, 0] +
+                                            inputImage.Data[y, x, 1] +
+                                            inputImage.Data[y, x, 2]) / 3.0;
+
+                    sumOfPixelAverages += avgPixelValue;
+                }
+            }
+
+            double mean = sumOfPixelAverages / totalPixels;
+
+            double sumOfSquaredDifferences = 0.0;
+
+            for (int y = 0; y < height; ++y)
+            {
+                for (int x = 0; x < width; ++x)
+                {
+                    double avgPixelValue = (inputImage.Data[y, x, 0] +
+                                            inputImage.Data[y, x, 1] +
+                                            inputImage.Data[y, x, 2]) / 3.0;
+
+                    double difference = avgPixelValue - mean;
+                    sumOfSquaredDifferences += difference * difference;
+                }
+            }
+
+            double stdDev = Math.Sqrt(sumOfSquaredDifferences / totalPixels);
+            return (mean, stdDev);
+        }
+
+        #endregion
 
         #region Convert color image to grayscale image
         public static Image<Gray, byte> Convert(Image<Bgr, byte> inputImage)

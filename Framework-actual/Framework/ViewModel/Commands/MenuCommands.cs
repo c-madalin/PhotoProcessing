@@ -49,6 +49,8 @@ namespace Framework.ViewModel
             set => _mainVM.ScaleValue = value;
         }
 
+
+
         #region File
 
         #region Load grayscale image
@@ -692,7 +694,7 @@ namespace Framework.ViewModel
         #endregion
 
         #region Crop image
-        
+
         private ICommand _cropImageCommand;
         public ICommand CropImageCommand
         {
@@ -731,63 +733,59 @@ namespace Framework.ViewModel
             Point StangaSus = new Point();
             Point DreaptaJos = new Point();
 
+            string statsMessage = "";
+            double mean = 0.0;
+            double stdDev = 0.0;
+
+
+            if (p1.X < p2.X)
+            {
+                StangaSus.X = p1.X;
+                DreaptaJos.X = p2.X;
+            }
+            else
+            {
+                StangaSus.X = p2.X;
+                DreaptaJos.X = p1.X;
+            }
+            if (p1.Y < p2.Y)
+            {
+                StangaSus.Y = p1.Y;
+                DreaptaJos.Y = p2.Y;
+            }
+            else
+            {
+                StangaSus.Y = p2.Y;
+                DreaptaJos.Y = p1.Y;
+            }
+
+
             if (GrayInitialImage != null)
             {
-
-                if (p1.X < p2.X)
-                {
-                    StangaSus.X = p1.X;
-                    DreaptaJos.X = p2.X;
-                }
-                else
-                {
-                    StangaSus.X = p2.X;
-                    DreaptaJos.X = p1.X;
-                }
-                if (p1.Y < p2.Y)
-                {
-                    StangaSus.Y = p1.Y;
-                    DreaptaJos.Y = p2.Y;
-                }
-                else
-                {
-                    StangaSus.Y = p2.Y;
-                    DreaptaJos.Y = p1.Y;
-                }
-
-
                 GrayProcessedImage = Tools.Crop(GrayInitialImage,(int)StangaSus.X, (int)StangaSus.Y, (int)DreaptaJos.X, (int)DreaptaJos.Y);
                 ProcessedImage = Convert(GrayProcessedImage);
+
+                (mean,stdDev) = Tools.GetStats(GrayInitialImage);
             }
             else if(ColorInitialImage != null)
             {
 
-                if (p1.X < p2.X)
-                {
-                    StangaSus.X = p1.X;
-                    DreaptaJos.X = p2.X;
-                }
-                else
-                {
-                    StangaSus.X = p2.X;
-                    DreaptaJos.X = p1.X;
-                }
-                if (p1.Y < p2.Y)
-                {
-                    StangaSus.Y = p1.Y;
-                    DreaptaJos.Y = p2.Y;
-                }
-                else
-                {
-                    StangaSus.Y = p2.Y;
-                    DreaptaJos.Y = p1.Y;
-                }
-
-
                 ColorProcessedImage = Tools.Crop(ColorInitialImage, (int)StangaSus.X, (int)StangaSus.Y, (int)DreaptaJos.X, (int)DreaptaJos.Y);
                 ProcessedImage = Convert(ColorProcessedImage);
+
+                (mean, stdDev) = Tools.GetStats(ColorInitialImage);
+
             }
             DrawRectangle(initialCanvas, StangaSus, DreaptaJos, 2, Brushes.Red, ScaleValue);
+
+            MouseClickCollection.Clear();
+
+            statsMessage = $"Media: {mean:F2}\nDeviatia Standard: {stdDev:F2}";
+
+            if (!string.IsNullOrEmpty(statsMessage))
+            {
+                MessageBox.Show($"Statistici zona decupata:\n{statsMessage}", "Rezultate", MessageBoxButton.OK);
+            }
 
         }
 
