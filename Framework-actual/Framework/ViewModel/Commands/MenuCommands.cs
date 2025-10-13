@@ -705,22 +705,25 @@ namespace Framework.ViewModel
         }
 
         private void CropImage(object parameter)
-        {
+        {   
+            var canvases = (object[])parameter;
+            var initialCanvas = canvases[0] as Canvas;
+            var processedCanvas = canvases[1] as Canvas;
+
+
             if (InitialImage == null)
             {
                 MessageBox.Show("Please add an image!");
                 return;
             }
 
-            ClearProcessedCanvas(parameter as Canvas);
+            ClearProcessedCanvas(processedCanvas);
 
             if(MouseClickCollection.Count < 2)
             {
                 MessageBox.Show("Please select an area first!");
                 return;
             }
-
-            Canvas canvas = parameter as Canvas;
 
             Point p1 = MouseClickCollection[MouseClickCollection.Count - 1];
             Point p2 = MouseClickCollection[MouseClickCollection.Count - 2];
@@ -752,7 +755,6 @@ namespace Framework.ViewModel
                     DreaptaJos.Y = p1.Y;
                 }
 
-            DrawRectangle(canvas, StangaSus, DreaptaJos, 2, Brushes.Red, ScaleValue);
 
                 GrayProcessedImage = Tools.Crop(GrayInitialImage,(int)StangaSus.X, (int)StangaSus.Y, (int)DreaptaJos.X, (int)DreaptaJos.Y);
                 ProcessedImage = Convert(GrayProcessedImage);
@@ -785,6 +787,8 @@ namespace Framework.ViewModel
                 ColorProcessedImage = Tools.Crop(ColorInitialImage, (int)StangaSus.X, (int)StangaSus.Y, (int)DreaptaJos.X, (int)DreaptaJos.Y);
                 ProcessedImage = Convert(ColorProcessedImage);
             }
+            DrawRectangle(initialCanvas, StangaSus, DreaptaJos, 2, Brushes.Red, ScaleValue);
+
         }
 
         #endregion
