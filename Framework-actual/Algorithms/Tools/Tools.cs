@@ -1,6 +1,10 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
 using OpenTK.Input;
+using System.Drawing;
+using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
+
 
 namespace Algorithms.Tools
 {
@@ -174,29 +178,47 @@ namespace Algorithms.Tools
 
         #region Crop
 
-        public static Image<Gray, byte> Crop(Image<Gray, byte> inputImage)
+        public static Image<Gray, byte> Crop(Image<Gray, byte> inputImage,int StangaSusX,int StangaSusY,int DreaptaJosX, int DreaptaJosY)
         {
-            int newWidth = inputImage.Height;
-            int newHeight = inputImage.Width;
+            int newWidth = DreaptaJosX - StangaSusX;
+            int newHeight = DreaptaJosY - StangaSusY;
 
 
-            Image<Gray, byte> result = new Image<Gray, byte>(newHeight, newWidth);
+            Image<Gray, byte> result = new Image<Gray, byte>(newWidth, newHeight);
 
-           
+            for (int y = StangaSusY; y < DreaptaJosY; ++y)
+            {
+                for (int x = StangaSusX; x < DreaptaJosX; ++x)
+                {
+                    result.Data[y - StangaSusY, x - StangaSusX, 0] = inputImage.Data[y, x, 0];
+
+                    //if(y==StangaSusY || y==DreaptaJosY-1|| x==StangaSusX || x==DreaptaJosX-1 )
+                    //inputImage.Data[y, x, 0] = 128;
+                }
+            }
+
 
 
 
             return result;
         }
-        public static Image<Bgr, byte> Crop(Image<Bgr, byte> inputImage)
+        public static Image<Bgr, byte> Crop(Image<Bgr, byte> inputImage, int StangaSusX, int StangaSusY, int DreaptaJosX, int DreaptaJosY)
         {
-            int newWidth = inputImage.Height;
-            int newHeight = inputImage.Width;
+            int newWidth = DreaptaJosX - StangaSusX;
+            int newHeight = DreaptaJosY - StangaSusY;
 
             Image<Bgr, byte> result = new Image<Bgr, byte>(newWidth, newHeight);
 
+            for (int y = StangaSusY; y < DreaptaJosY; ++y)
+            {
+                for (int x = StangaSusX; x < DreaptaJosX; ++x)
+                {
+                    result.Data[y - StangaSusY, x - StangaSusX, 0] = inputImage.Data[y, x, 0];
+                    result.Data[y - StangaSusY, x - StangaSusX, 1] = inputImage.Data[y, x, 1];
+                    result.Data[y - StangaSusY, x - StangaSusX, 2] = inputImage.Data[y, x, 2];
+                }
+            }
 
-            
 
             return result;
         }

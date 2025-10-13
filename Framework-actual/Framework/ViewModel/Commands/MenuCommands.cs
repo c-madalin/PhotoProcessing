@@ -18,6 +18,7 @@ using static Framework.Converters.ImageConverter;
 using Algorithms.Sections;
 using Algorithms.Tools;
 using Algorithms.Utilities;
+using System.Linq;
 
 namespace Framework.ViewModel
 {
@@ -719,22 +720,71 @@ namespace Framework.ViewModel
                 return;
             }
 
-            if(GrayInitialImage != null)
+            Canvas canvas = parameter as Canvas;
+
+            Point p1 = MouseClickCollection[MouseClickCollection.Count - 1];
+            Point p2 = MouseClickCollection[MouseClickCollection.Count - 2];
+
+            Point StangaSus = new Point();
+            Point DreaptaJos = new Point();
+
+            if (GrayInitialImage != null)
             {
-                GrayProcessedImage = Tools.Crop(GrayInitialImage);
+
+                if (p1.X < p2.X)
+                {
+                    StangaSus.X = p1.X;
+                    DreaptaJos.X = p2.X;
+                }
+                else
+                {
+                    StangaSus.X = p2.X;
+                    DreaptaJos.X = p1.X;
+                }
+                if (p1.Y < p2.Y)
+                {
+                    StangaSus.Y = p1.Y;
+                    DreaptaJos.Y = p2.Y;
+                }
+                else
+                {
+                    StangaSus.Y = p2.Y;
+                    DreaptaJos.Y = p1.Y;
+                }
+
+            DrawRectangle(canvas, StangaSus, DreaptaJos, 2, Brushes.Red, ScaleValue);
+
+                GrayProcessedImage = Tools.Crop(GrayInitialImage,(int)StangaSus.X, (int)StangaSus.Y, (int)DreaptaJos.X, (int)DreaptaJos.Y);
                 ProcessedImage = Convert(GrayProcessedImage);
             }
             else if(ColorInitialImage != null)
             {
-                ColorProcessedImage = Tools.Crop(ColorInitialImage);
+
+                if (p1.X < p2.X)
+                {
+                    StangaSus.X = p1.X;
+                    DreaptaJos.X = p2.X;
+                }
+                else
+                {
+                    StangaSus.X = p2.X;
+                    DreaptaJos.X = p1.X;
+                }
+                if (p1.Y < p2.Y)
+                {
+                    StangaSus.Y = p1.Y;
+                    DreaptaJos.Y = p2.Y;
+                }
+                else
+                {
+                    StangaSus.Y = p2.Y;
+                    DreaptaJos.Y = p1.Y;
+                }
+
+
+                ColorProcessedImage = Tools.Crop(ColorInitialImage, (int)StangaSus.X, (int)StangaSus.Y, (int)DreaptaJos.X, (int)DreaptaJos.Y);
                 ProcessedImage = Convert(ColorProcessedImage);
             }
-            else if(ColorInitialImage!= null)
-            {
-
-            }
-
-
         }
 
         #endregion
