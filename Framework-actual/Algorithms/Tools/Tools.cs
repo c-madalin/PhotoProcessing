@@ -312,11 +312,19 @@ namespace Algorithms.Tools
         {
             Image<Gray, byte> result = new Image<Gray, byte>(inputImage.Size);
 
+            byte[] LUT = new byte[256];
+            for(int i=0;i<=255;i++)
+            {
+                //LUT[i] = (byte)(alpha * i + beta);
+                LUT[i] = (byte)(Math.Min(255,Math.Max(0,alpha * i + beta))+0.5f);
+
+            }
+
             for (int y = 0; y < inputImage.Height; ++y)
             {
                 for (int x = 0; x < inputImage.Width; ++x)
                 {
-                    result.Data[y, x, 0] = (byte)(alpha * inputImage.Data[y, x, 0] + beta);
+                    result.Data[y, x, 0] = LUT[inputImage.Data[y,x,0]];
                 }
             }
             return result;
@@ -330,13 +338,19 @@ namespace Algorithms.Tools
             {
                 for (int x = 0; x < inputImage.Width; ++x)
                 {
-                    result.Data[y, x, 0] = (byte)(alpha * inputImage.Data[y, x, 0] + beta);
-                    result.Data[y, x, 1] = (byte)(alpha * inputImage.Data[y, x, 1] + beta);
-                    result.Data[y, x, 2] = (byte)(alpha * inputImage.Data[y, x, 2] + beta);
+                    double newBlue = alpha * inputImage.Data[y, x, 0] + beta;
+                    result.Data[y, x, 0] = (byte)Math.Min(255, Math.Max(0, newBlue));
+
+                    double newGreen = alpha * inputImage.Data[y, x, 1] + beta;
+                    result.Data[y, x, 1] = (byte)Math.Min(255, Math.Max(0, newGreen));
+
+                    double newRed = alpha * inputImage.Data[y, x, 2] + beta;
+                    result.Data[y, x, 2] = (byte)Math.Min(255, Math.Max(0, newRed));
                 }
             }
             return result;
         }
+
         #endregion
 
         #region Convert color image to grayscale image

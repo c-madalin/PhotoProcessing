@@ -828,6 +828,72 @@ namespace Framework.ViewModel
         #endregion
 
         #region Pointwise operations
+
+        #region Contrast and Brightness 
+
+        private ICommand _cbImageCommand;
+        public ICommand CBImageCommand
+        {
+            get
+            {
+                if (_cbImageCommand == null)
+                    _cbImageCommand = new RelayCommand(CBImage);
+                return _cbImageCommand;
+            }
+        }
+
+
+        private void CBImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+
+            ClearProcessedCanvas(parameter as Canvas);
+
+            double alpha = 1.0; // Contrast control (1.0-3.0)
+            double beta = 0.0;  // Brightness control (0-100)
+
+            List<string> labels = new List<string>
+                    {
+                    "Contrast (alpha):",
+                    "Brightness (beta):"
+                    };
+
+            DialogWindow dialog = new DialogWindow(_mainVM, labels);
+            dialog.ShowDialog();
+
+
+            List<double> values = dialog.GetValues();
+            alpha=values[0];
+            if (alpha < 0.0) alpha = 1.0;
+
+            beta=values[1];
+            //if(beta<)
+
+
+
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.ContrastAndBrisghtness(GrayInitialImage,alpha,beta);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = Tools.ContrastAndBrisghtness(ColorInitialImage, alpha, beta);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+        }
+       
+
+
+        
+
+        #endregion
+
+
         #endregion
 
         #region Thresholding

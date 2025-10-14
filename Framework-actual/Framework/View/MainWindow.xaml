@@ -198,6 +198,11 @@
             <MenuItem Header="Pointwise operations"
                       Background="{Binding Path=Theme.MenuItemBackgroundColor}"
                       Foreground="{Binding Path=Theme.MenuItemForegroundColor}">
+                
+                <MenuItem Header="Contrast and Brightness" 
+                    Foreground="#1E1E1E" 
+                    Command="{Binding Path=MenuCommands.CBImageCommand}"
+                    CommandParameter="{Binding ElementName=processedImageCanvas}"/>
 
             </MenuItem>
 
