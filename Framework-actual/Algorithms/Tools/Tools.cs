@@ -307,6 +307,38 @@ namespace Algorithms.Tools
 
         #endregion
 
+        #region Contrast and Brightness
+        public static Image<Gray, byte> ContrastAndBrisghtness(Image<Gray, byte> inputImage ,double alpha, double beta)
+        {
+            Image<Gray, byte> result = new Image<Gray, byte>(inputImage.Size);
+
+            for (int y = 0; y < inputImage.Height; ++y)
+            {
+                for (int x = 0; x < inputImage.Width; ++x)
+                {
+                    result.Data[y, x, 0] = (byte)(alpha * inputImage.Data[y, x, 0] + beta);
+                }
+            }
+            return result;
+        }
+
+        public static Image<Bgr, byte> ContrastAndBrisghtness(Image<Bgr, byte> inputImage, double alpha, double beta)
+        {
+            Image<Bgr, byte> result = new Image<Bgr, byte>(inputImage.Size);
+
+            for (int y = 0; y < inputImage.Height; ++y)
+            {
+                for (int x = 0; x < inputImage.Width; ++x)
+                {
+                    result.Data[y, x, 0] = (byte)(alpha * inputImage.Data[y, x, 0] + beta);
+                    result.Data[y, x, 1] = (byte)(alpha * inputImage.Data[y, x, 1] + beta);
+                    result.Data[y, x, 2] = (byte)(alpha * inputImage.Data[y, x, 2] + beta);
+                }
+            }
+            return result;
+        }
+        #endregion
+
         #region Convert color image to grayscale image
         public static Image<Gray, byte> Convert(Image<Bgr, byte> inputImage)
         {
