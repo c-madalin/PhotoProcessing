@@ -204,6 +204,11 @@
                     Command="{Binding Path=MenuCommands.CBImageCommand}"
                     CommandParameter="{Binding ElementName=processedImageCanvas}"/>
 
+                <MenuItem Header="Gamma Opperator" 
+                    Foreground="#1E1E1E" 
+                    Command="{Binding Path=MenuCommands.GammaImageCommand}"
+                    CommandParameter="{Binding ElementName=processedImageCanvas}"/>
+
             </MenuItem>
 
             <MenuItem Header="Thresholding"

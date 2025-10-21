@@ -353,6 +353,58 @@ namespace Algorithms.Tools
 
         #endregion
 
+        #region Gamma
+        public static Image<Gray, byte> Gamma(Image<Gray, byte> inputImage,double gamma)
+        {
+            Image<Gray, byte> result = new Image<Gray, byte>(inputImage.Size);
+
+            byte[] LUT = new byte[256];
+
+            double c = 255.0/Math.Pow(255,gamma) ;
+
+            for (int i = 0; i <= 255; i++)
+            {
+                LUT[i] = (byte)(c * Math.Pow(i, gamma));
+
+            }
+
+            for (int y = 0; y < inputImage.Height; ++y)
+            {
+                for (int x = 0; x < inputImage.Width; ++x)
+                {
+                    result.Data[y, x, 0] = (byte)(LUT[ inputImage.Data[y, x, 0]]);
+                }
+            }
+            return result;
+        }
+
+        public static Image<Bgr, byte> Gamma(Image<Bgr, byte> inputImage, double gamma)
+        {
+            Image<Bgr, byte> result = new Image<Bgr, byte>(inputImage.Size);
+
+            byte[] LUT = new byte[256];
+            double c = 255.0 / Math.Pow(255, gamma);
+
+            for (int i = 0; i <= 255; i++)
+            {
+                LUT[i] = (byte)(c * Math.Pow(i, gamma));
+            }
+
+            for (int y = 0; y < inputImage.Height; ++y)
+            {
+                for (int x = 0; x < inputImage.Width; ++x)
+                {
+                    for (int channel = 0; channel < 3; channel++)
+                    {
+                        result.Data[y, x, channel] = LUT[inputImage.Data[y, x, channel]];
+                    }
+                }
+            }
+
+            return result;
+        }
+        #endregion
+
         #region Convert color image to grayscale image
         public static Image<Gray, byte> Convert(Image<Bgr, byte> inputImage)
         {

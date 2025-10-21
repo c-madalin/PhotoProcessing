@@ -886,12 +886,63 @@ namespace Framework.ViewModel
                 ProcessedImage = Convert(ColorProcessedImage);
             }
         }
-       
-
-
-        
 
         #endregion
+
+        #region Gamma 
+
+        private ICommand _gammaImageCommand;
+        public ICommand GammaImageCommand
+        {
+            get
+            {
+                if (_gammaImageCommand == null)
+                    _gammaImageCommand = new RelayCommand(GammaImage);
+                return _gammaImageCommand;
+            }
+        }
+
+        private void GammaImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+
+            ClearProcessedCanvas(parameter as Canvas);
+
+            double gamma = 1.0; // Gamma control (0.1-5.0)
+            List<string> labels = new List<string>
+                    {
+                    "Gamma:"
+                    };
+            DialogWindow dialog = new DialogWindow(_mainVM, labels);
+            dialog.ShowDialog();
+
+
+            List<double> value = dialog.GetValues();
+            gamma = value[0];
+
+            if(gamma<0) gamma = 1.0;
+
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.Gamma(GrayInitialImage,gamma);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                ColorProcessedImage = Tools.Gamma(ColorInitialImage,gamma);
+                ProcessedImage = Convert(ColorProcessedImage);
+            }
+
+        }
+        #endregion
+
+
+
+
 
 
         #endregion
