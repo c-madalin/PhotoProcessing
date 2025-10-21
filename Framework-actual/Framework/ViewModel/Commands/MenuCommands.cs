@@ -948,6 +948,47 @@ namespace Framework.ViewModel
         #endregion
 
         #region Thresholding
+
+        #region Minimum Error  
+
+        private ICommand _minerrImageCommand;
+        public ICommand MinErrImageCommand
+        {
+            get
+            {
+                if (_minerrImageCommand == null)
+                    _minerrImageCommand = new RelayCommand(MinErrImage);
+                return _minerrImageCommand;
+            }
+        }
+
+
+        private void MinErrImage(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+
+            ClearProcessedCanvas(parameter as Canvas);
+
+
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Tools.MinErr(GrayInitialImage);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                MessageBox.Show("Please add an grayscale image!");
+                return;
+            }
+
+        }
+
+        #endregion
+
         #endregion
 
         #region Filters
