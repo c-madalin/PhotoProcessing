@@ -996,6 +996,12 @@ namespace Framework.ViewModel
 
         #region Minimum Error  
 
+        private double[,] filter = new double[3, 3] { { 0.1, 0.1, 0.1 }, { 0.1, 0.2, 0.1 }, { 0.1, 0.1, 0.1 } };
+
+        private double[,] filter1 = new double[3, 1] { {0.25 },{0.5 },{0.25 } };
+        private double[,] filter2 = new double[1, 3] { { 0.25, 0.5, 0.25 } };
+
+
         private ICommand _customFilterCommand;
         public ICommand CustomFilterCommand
         {
@@ -1021,7 +1027,7 @@ namespace Framework.ViewModel
 
             if (GrayInitialImage != null)
             {
-                GrayProcessedImage = Filters.ApplyFilter(GrayInitialImage,50, 50);
+                GrayProcessedImage = Filters.ApplyFilter(GrayInitialImage,filter1);
                 ProcessedImage = Convert(GrayProcessedImage);
             }
             else if (ColorInitialImage != null)

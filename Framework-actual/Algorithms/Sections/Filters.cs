@@ -23,10 +23,36 @@ namespace Algorithms.Sections
             }
             return expandedImage;
         }
-        public static Image<Gray, byte> ApplyFilter(Image<Gray, byte> initialImage, int filterWidth, int filterHeight)
+        public static Image<Gray, byte> ApplyFilter(Image<Gray, byte> initialImage, double[,] filter)
         {
-            
-            return ExpandImage(initialImage, filterWidth / 2, filterHeight / 2);
+            int height = filter.GetLength(0);
+            int width = filter.GetLength(1);
+            int half_h = height / 2;
+            int half_w = width / 2;
+
+            Image<Gray, byte> resultImage = new Image<Gray, byte>(initialImage.Width, initialImage.Height);
+            Image<Gray, byte> temp = ExpandImage(initialImage, half_w, half_h);
+
+            for (int y = 0; y < resultImage.Height; y++)
+            {
+                for (int x = 0; x < resultImage.Width; x++)
+                {
+                    double kernelValue = 0.0;
+
+                    for (int offY = -half_h; offY <= half_h; offY++)
+                    {
+                        for (int offX = -half_w; offX <= half_w; offX++)
+                        {
+                            kernelValue += filter[offY + half_h, offX + half_w] *
+                                           temp.Data[y + offY + half_h, x + offX + half_w, 0];
+                        }
+                    }
+
+                    resultImage.Data[y, x, 0] = (byte)Math.Max(0, Math.Min(255, (int)kernelValue));
+                }
+            }
+
+            return resultImage;
         }
     }
 }
