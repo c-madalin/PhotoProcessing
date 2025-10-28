@@ -423,76 +423,86 @@ namespace Algorithms.Tools
         #region MinErr
         public static Image<Gray, byte> MinErr(Image<Gray, byte> inputImage)
         {
-            Image<Gray, byte> result = new Image<Gray, byte>(inputImage.Size);
+            if (inputImage == null || inputImage.Width == 0 || inputImage.Height == 0)
+            {
+                return new Image<Gray, byte>(1, 1);
+            }
 
-            List<Double>histograma= Histogram2(inputImage);
+            List<double> histograma = Histogram2(inputImage);
 
-            int Threshold = 0;
-
-            int minError = int.MaxValue;
+            double minError = double.MaxValue;
+            int optimalThreshold = 0;
 
             double P1 = 0.0;
-            double P2 = 0.0;
-            double mu1 = 0.0; // suma k * p(k) de la 0 la t-1
-            double mu2 = 0.0; // suma k * p(k) de la t la 255
+            double mu1_sum = 0.0;
 
-            double total_mu_sum = 0.0;
-
+            // Calculează suma totală o singură dată (suma k * p(k) pentru toate nivelele)
+            double mu_T_sum = 0.0;
             for (int k = 0; k < 256; k++)
             {
-                total_mu_sum += k * histograma[k];
+                mu_T_sum += k * histograma[k];
             }
 
-            for (int t=1;t<254;t++)
+            // Iterăm pragul 't' de la 1 la 254 (pentru a avea două clase)
+            for (int t = 1; t < 255; t++)
             {
-                for (int k = 0; k < 256; k++)
-                {
-                    total_mu_sum += k * histograma[k];
-                }
-                
+                // Actualizăm proprietățile cumulative pentru clasa 1 (Background: 0 la t-1)
                 P1 += histograma[t - 1];
-                mu1 += (t - 1) * histograma[t - 1];
+                mu1_sum += (t - 1) * histograma[t - 1];
 
-      
-                P2 = 1 - P1;
-                mu2 = total_mu_sum - mu1;
+                double P2 = 1.0 - P1; // Probabilitate clasa 2 (Foreground)
 
-                double sigma1 = 0.0;
-                for (int k = 0; k <= t - 1; k++)
+                if (P1 < 1e-6 || P2 < 1e-6) // Evităm împărțirea la zero
                 {
-                    sigma1 += (k - mu1)* (k - mu1) * histograma[k];
+                    continue;
                 }
-                double s1 = sigma1 / P1;
 
+                // Calculează Mediile (Mean)
+                double mu1_mean = mu1_sum / P1;
+                double mu2_sum = mu_T_sum - mu1_sum;
+                double mu2_mean = mu2_sum / P2;
 
-                double sigma2 = 0.0;
+                // Calculează Varianța (Variance, sigma pătrat) pentru Clasa 1
+                double sigma1_sum = 0.0;
+                for (int k = 0; k < t; k++)
+                {
+                    double diff = k - mu1_mean;
+                    sigma1_sum += diff * diff * histograma[k];
+                }
+                double sigma1_sq = sigma1_sum / P1;
+
+                // Calculează Varianța (Variance, sigma pătrat) pentru Clasa 2
+                double sigma2_sum = 0.0;
                 for (int k = t; k < 256; k++)
                 {
-                    sigma2 += (k - mu2)* (k - mu2) * histograma[k];
+                    double diff = k - mu2_mean;
+                    sigma2_sum += diff * diff * histograma[k];
                 }
-                double s2 = sigma2 / P2;
+                double sigma2_sq = sigma2_sum / P2;
 
-
-                double currentError = double.MaxValue;
-                if (s1 > 0 && s2 > 0)
+                if (sigma1_sq <= 0 || sigma2_sq <= 0)
                 {
-                    currentError = P1 * Math.Log(s1) + P2 * Math.Log(s2);
+                    continue;
                 }
+
+                // Calculează Funcția de Eroare J(t)
+                // J(t) = P1 * log(sigma1^2) + P2 * log(sigma2^2) - 2 * (P1 * log(P1) + P2 * log(P2))
+                double currentError = P1 * Math.Log(sigma1_sq) +
+                                      P2 * Math.Log(sigma2_sq) -
+                                      2.0 * (P1 * Math.Log(P1) + P2 * Math.Log(P2));
+
+                // Găsește pragul optim
                 if (currentError < minError)
                 {
-                    minError = (int)currentError;
-                    Threshold = t;
+                    minError = currentError;
+                    optimalThreshold = t;
                 }
-
-
             }
 
-
-
-            result = Binar2(inputImage, Threshold);
+            // Aplică binarizarea cu pragul optim
+            Image<Gray, byte> result = Binar2(inputImage, optimalThreshold);
             return result;
         }
-
         #endregion
 
 
