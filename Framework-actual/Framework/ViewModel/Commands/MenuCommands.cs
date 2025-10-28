@@ -992,6 +992,47 @@ namespace Framework.ViewModel
         #endregion
 
         #region Filters
+        //LowPassCommand
+
+        #region Minimum Error  
+
+        private ICommand _customFilterCommand;
+        public ICommand CustomFilterCommand
+        {
+            get
+            {
+                if (_customFilterCommand == null)
+                    _customFilterCommand = new RelayCommand(CustomFilter);
+                return _customFilterCommand;
+            }
+        }
+
+
+        private void CustomFilter(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+
+            ClearProcessedCanvas(parameter as Canvas);
+
+
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Filters.ApplyFilter(GrayInitialImage,50, 50);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                MessageBox.Show("Please add an grayscale image!");
+                return;
+            }
+
+        }
+
+        #endregion
         #endregion
 
         #region Morphological operations

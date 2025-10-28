@@ -571,7 +571,6 @@ namespace Algorithms.Tools
 
         #endregion
 
-
     }
 }
 
