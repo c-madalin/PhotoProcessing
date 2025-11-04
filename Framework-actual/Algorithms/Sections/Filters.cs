@@ -2,6 +2,7 @@
 using Emgu.CV.Structure;
 using System.Drawing;
 using System;
+using System.Security.Cryptography;
 
 
 namespace Algorithms.Sections
@@ -51,8 +52,71 @@ namespace Algorithms.Sections
                     resultImage.Data[y, x, 0] = (byte)Math.Max(0, Math.Min(255, (int)kernelValue));
                 }
             }
-
             return resultImage;
+        }
+        
+    
+
+        public static double[,] GaussMask(double sigma_x, double sigma_y)
+        {
+            int width = (int)Math.Ceiling(4 * sigma_x);
+            int height = (int)Math.Ceiling(4 * sigma_y);
+            if (width % 2 == 0) width++;
+            if (width < 1) width = 1;
+
+            if (height % 2 == 0) height++;
+            if (height < 1) height = 1;
+
+            double[,] mask = new double[height, width];
+
+            int half_w = width / 2;
+            int half_h = height / 2;
+
+            double twoSigmaXSq = 2.0 * sigma_x * sigma_x;
+            double twoSigmaYSq = 2.0 * sigma_y * sigma_y;
+            double denom = 2.0 * Math.PI * sigma_x * sigma_y;
+
+            double sum = 0.0;
+
+            for (int iy = -half_h; iy <= half_h; iy++)
+            {
+                for (int ix = -half_w; ix <= half_w; ix++)
+                {
+                    double exponent = -((ix * ix) / twoSigmaXSq + (iy * iy) / twoSigmaYSq);
+                    double value = (1.0 / denom) * Math.Exp(exponent);
+                    mask[iy + half_h, ix + half_w] = value;
+                    sum += value;
+                }
+            }
+
+           
+            if (sum != 0.0)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        mask[y, x] /= sum;
+                    }
+                }
+            }
+
+
+            return mask;
+        }
+
+        public static Image<Gray,Byte> GaussFilter(Image<Gray,byte> initialImage,double sigma_x, double sigma_y)
+        {
+    
+            if (initialImage == null) return null;
+            if (sigma_x <= 0 && sigma_y <= 0) return initialImage.Clone();
+
+            double[,] gaussMask = GaussMask(sigma_x, sigma_y);
+            return ApplyFilter(initialImage, gaussMask);
+
+
         }
     }
 }
+
+
