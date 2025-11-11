@@ -241,6 +241,16 @@
                     Foreground="#1E1E1E" 
                     Command="{Binding Path=MenuCommands.GaussFilterCommand}"
                     CommandParameter="{Binding ElementName=processedImageCanvas}"/>
+
+                <MenuItem Header="Laplace Filter" 
+                    Foreground="#1E1E1E" 
+                    Command="{Binding Path=MenuCommands.LaplaceFilterCommand}"
+                    CommandParameter="{Binding ElementName=processedImageCanvas}"/>
+
+                <MenuItem Header="Zero Crossing Filter" 
+                    Foreground="#1E1E1E" 
+                    Command="{Binding Path=MenuCommands.ZeroCrossingFilterCommand}"
+                    CommandParameter="{Binding ElementName=processedImageCanvas}"/>
             </MenuItem>
 
             <MenuItem Header="Morphological operations"

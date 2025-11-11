@@ -1096,6 +1096,86 @@ namespace Framework.ViewModel
 
         #endregion
 
+        #region Laplace Filter
+
+        private ICommand _laplaceFilterCommand;
+        public ICommand LaplaceFilterCommand
+        {
+            get
+            {
+                if (_laplaceFilterCommand == null)
+                    _laplaceFilterCommand = new RelayCommand(LaplaceFilter);
+                return _laplaceFilterCommand;
+            }
+        }
+
+        private void LaplaceFilter(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+
+            ClearProcessedCanvas(parameter as Canvas);
+
+            
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Filters.LaplaceFilter(GrayInitialImage);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                MessageBox.Show("Please add an grayscale image!");
+                return;
+            }
+
+        }
+
+
+        #endregion
+
+
+        #region Zero Crossing Filter
+
+        private ICommand _zeroCrossingFilterCommand;
+        public ICommand ZeroCrossingFilterCommand
+        {
+            get
+            {
+                if (_zeroCrossingFilterCommand == null)
+                    _zeroCrossingFilterCommand = new RelayCommand(ZeroCrossingFilter);
+                return _zeroCrossingFilterCommand;
+            }
+        }
+
+        private void ZeroCrossingFilter(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+
+            ClearProcessedCanvas(parameter as Canvas);
+
+
+            if (GrayInitialImage != null)
+            {
+                GrayProcessedImage = Filters.ZeroCrossingFilter(GrayInitialImage);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+            else if (ColorInitialImage != null)
+            {
+                MessageBox.Show("Please add an grayscale image!");
+                return;
+            }
+
+        }
+
+
+        #endregion
 
 
         #endregion
