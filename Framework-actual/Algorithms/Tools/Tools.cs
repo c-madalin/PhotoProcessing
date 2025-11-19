@@ -436,33 +436,30 @@ namespace Algorithms.Tools
             double P1 = 0.0;
             double mu1_sum = 0.0;
 
-            // Calculează suma totală o singură dată (suma k * p(k) pentru toate nivelele)
             double mu_T_sum = 0.0;
             for (int k = 0; k < 256; k++)
             {
                 mu_T_sum += k * histograma[k];
             }
 
-            // Iterăm pragul 't' de la 1 la 254 (pentru a avea două clase)
             for (int t = 1; t < 255; t++)
             {
-                // Actualizăm proprietățile cumulative pentru clasa 1 (Background: 0 la t-1)
                 P1 += histograma[t - 1];
                 mu1_sum += (t - 1) * histograma[t - 1];
 
-                double P2 = 1.0 - P1; // Probabilitate clasa 2 (Foreground)
+                double P2 = 1.0 - P1; 
 
-                if (P1 < 1e-6 || P2 < 1e-6) // Evităm împărțirea la zero
+                if (P1 < 1e-6 || P2 < 1e-6)
                 {
                     continue;
                 }
 
-                // Calculează Mediile (Mean)
+               
                 double mu1_mean = mu1_sum / P1;
                 double mu2_sum = mu_T_sum - mu1_sum;
                 double mu2_mean = mu2_sum / P2;
 
-                // Calculează Varianța (Variance, sigma pătrat) pentru Clasa 1
+               
                 double sigma1_sum = 0.0;
                 for (int k = 0; k < t; k++)
                 {
@@ -471,7 +468,7 @@ namespace Algorithms.Tools
                 }
                 double sigma1_sq = sigma1_sum / P1;
 
-                // Calculează Varianța (Variance, sigma pătrat) pentru Clasa 2
+               
                 double sigma2_sum = 0.0;
                 for (int k = t; k < 256; k++)
                 {
@@ -485,13 +482,12 @@ namespace Algorithms.Tools
                     continue;
                 }
 
-                // Calculează Funcția de Eroare J(t)
-                // J(t) = P1 * log(sigma1^2) + P2 * log(sigma2^2) - 2 * (P1 * log(P1) + P2 * log(P2))
+                
                 double currentError = P1 * Math.Log(sigma1_sq) +
                                       P2 * Math.Log(sigma2_sq) -
                                       2.0 * (P1 * Math.Log(P1) + P2 * Math.Log(P2));
 
-                // Găsește pragul optim
+                
                 if (currentError < minError)
                 {
                     minError = currentError;
@@ -499,7 +495,6 @@ namespace Algorithms.Tools
                 }
             }
 
-            // Aplică binarizarea cu pragul optim
             Image<Gray, byte> result = Binar2(inputImage, optimalThreshold);
             return result;
         }
