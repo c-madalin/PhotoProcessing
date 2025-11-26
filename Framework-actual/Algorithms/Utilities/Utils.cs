@@ -21,6 +21,26 @@ namespace Algorithms.Utilities
 
             return histogram;
         }
+        internal static Image<Gray, byte> Binarization(Image<Gray, byte> grayInitialImage, int threshold, bool option)
+        {
+            Image<Gray, byte> binaryImage = new Image<Gray, byte>(grayInitialImage.Size);
+            for (int y = 0; y < grayInitialImage.Height; y++)
+            {
+                for (int x = 0; x < grayInitialImage.Width; x++)
+                {
+                    byte pixelValue = grayInitialImage.Data[y, x, 0];
+                    if (option)
+                    {
+                        binaryImage.Data[y, x, 0] = (pixelValue >= threshold) ? (byte)255 : (byte)0;
+                    }
+                    else
+                    {
+                        binaryImage.Data[y, x, 0] = (pixelValue <= threshold) ? (byte)255 : (byte)0;
+                    }
+                }
+            }
+            return binaryImage;
+        }
         #endregion
     }
 }

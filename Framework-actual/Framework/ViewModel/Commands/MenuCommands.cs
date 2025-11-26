@@ -1181,6 +1181,42 @@ namespace Framework.ViewModel
         #endregion
 
         #region Morphological operations
+
+        #region Dilatare
+
+        private ICommand _dilatareCommand;
+        public ICommand DilatareCommand
+        {
+            get
+            {
+                if (_dilatareCommand == null)
+                    _dilatareCommand = new RelayCommand(Dilatare);
+                return _dilatareCommand;
+            }
+        }
+
+        private void Dilatare(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+            if (GrayInitialImage != null)
+            {
+                List<string> options = new List<string> { "h", "w", "T", "()" };
+                DialogWindow window = new DialogWindow(_mainVM, options);
+                window.ShowDialog();
+                var values = window.GetValues();
+                var height = (int)values[0];
+                var width = (int)values[1];
+                var threshold = (int)values[2];
+                var option = (int)values[3];
+                GrayProcessedImage = MorphologicalOperations.Dilation(GrayInitialImage, height, width, threshold, option != 0);
+                ProcessedImage = Convert(GrayProcessedImage);
+            }
+        }
+        #endregion
         #endregion
 
         #region Geometric transformations
