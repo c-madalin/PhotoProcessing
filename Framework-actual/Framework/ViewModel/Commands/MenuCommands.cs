@@ -1217,7 +1217,89 @@ namespace Framework.ViewModel
             }
         }
         #endregion
+
+        #region Eroziune
+        private ICommand _eroziuneCommand;
+        public ICommand EroziuneCommand
+        {
+            get
+            {
+                if (_eroziuneCommand == null)
+                    _eroziuneCommand = new RelayCommand(Eroziune);
+                return _eroziuneCommand;
+            }
+        }
+
+        private void Eroziune(object parameter)
+        {
+            if (InitialImage == null) return;
+
+            // Refolosim logica de dialog
+            List<string> options = new List<string> { "h", "w", "T", "()" };
+            DialogWindow window = new DialogWindow(_mainVM, options);
+            window.ShowDialog();
+            var values = window.GetValues();
+
+            // Apelam algoritmul
+            GrayProcessedImage = MorphologicalOperations.Erosion(GrayInitialImage, (int)values[0], (int)values[1], (int)values[2], (int)values[3] != 0);
+            ProcessedImage = Convert(GrayProcessedImage);
+        }
         #endregion
+
+        #region Deschidere (Opening)
+        private ICommand _deschidereCommand;
+        public ICommand DeschidereCommand
+        {
+            get
+            {
+                if (_deschidereCommand == null)
+                    _deschidereCommand = new RelayCommand(Deschidere);
+                return _deschidereCommand;
+            }
+        }
+
+        private void Deschidere(object parameter)
+        {
+            if (InitialImage == null) return;
+
+            List<string> options = new List<string> { "h", "w", "T", "()" };
+            DialogWindow window = new DialogWindow(_mainVM, options);
+            window.ShowDialog();
+            var values = window.GetValues();
+
+            GrayProcessedImage = MorphologicalOperations.Opening(GrayInitialImage, (int)values[0], (int)values[1], (int)values[2], (int)values[3] != 0);
+            ProcessedImage = Convert(GrayProcessedImage);
+        }
+        #endregion
+
+        #region Inchidere (Closing)
+        private ICommand _inchidereCommand;
+        public ICommand InchidereCommand
+        {
+            get
+            {
+                if (_inchidereCommand == null)
+                    _inchidereCommand = new RelayCommand(Inchidere);
+                return _inchidereCommand;
+            }
+        }
+
+        private void Inchidere(object parameter)
+        {
+            if (InitialImage == null) return;
+
+            List<string> options = new List<string> { "h", "w", "T", "()" };
+            DialogWindow window = new DialogWindow(_mainVM, options);
+            window.ShowDialog();
+            var values = window.GetValues();
+
+            GrayProcessedImage = MorphologicalOperations.Closing(GrayInitialImage, (int)values[0], (int)values[1], (int)values[2], (int)values[3] != 0);
+            ProcessedImage = Convert(GrayProcessedImage);
+        }
+        #endregion
+
+        
+#endregion
 
         #region Geometric transformations
         #endregion

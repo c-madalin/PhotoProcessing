@@ -55,5 +55,74 @@ namespace Algorithms.Sections
             return result;
 
         }
+        public static Image<Gray, byte> Erosion(Image<Gray, byte> grayInitialImage, int height, int width, int threshold, bool option)
+        {
+            // 1. Binarizare
+            Image<Gray, byte> binaryImage = Utils.Binarization(grayInitialImage, threshold, option);
+            Image<Gray, byte> result = new Image<Gray, byte>(grayInitialImage.Size);
+
+            float[,] structuringElement = new float[height, width];
+            for (int j = 0; j < height; j++)
+                for (int i = 0; i < width; i++)
+                    structuringElement[j, i] = 1;
+
+            int offsetY = height / 2;
+            int offsetX = width / 2;
+
+            // 3. Scanare imagine
+            for (int y = 0; y < binaryImage.Height; y++)
+            {
+                for (int x = 0; x < binaryImage.Width; x++)
+                {
+                    bool shouldKeep = true; // Presupunem că se potrivește (FIT)
+
+                    for (int j = -offsetY; j <= offsetY; j++)
+                    {
+                        for (int i = -offsetX; i <= offsetX; i++)
+                        {
+                            int neighborY = y + j;
+                            int neighborX = x + i;
+
+                            if (structuringElement[j + offsetY, i + offsetX] == 1)
+                            {
+                                if (neighborY >= 0 && neighborY < binaryImage.Height &&
+                                    neighborX >= 0 && neighborX < binaryImage.Width)
+                                {
+                                    if (binaryImage.Data[neighborY, neighborX, 0] != 255)
+                                    {
+                                        shouldKeep = false;
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                   
+                                    shouldKeep = false;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!shouldKeep) break;
+                    }
+                    result.Data[y, x, 0] = shouldKeep ? (byte)255 : (byte)0;
+                }
+            }
+            return result;
+        }
+
+        public static Image<Gray, byte> Opening(Image<Gray, byte> image, int height, int width, int threshold, bool option)
+        {
+            Image<Gray, byte> eroded = Erosion(image, height, width, threshold, option);
+
+        
+            return Dilation(eroded, height, width, 127, true);
+        }
+
+        public static Image<Gray, byte> Closing(Image<Gray, byte> image, int height, int width, int threshold, bool option)
+        {
+            Image<Gray, byte> dilated = Dilation(image, height, width, threshold, option);
+
+            return Erosion(dilated, height, width, 127, true);
+        }
     }
 }
