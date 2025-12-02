@@ -132,6 +132,7 @@ namespace Algorithms.Sections
         public static Image<Bgr, byte> ColorDilation(Image<Bgr, byte> inputImage, int height, int width)
         {
             Image<Bgr, byte> result = new Image<Bgr, byte>(inputImage.Size);
+
             int offsetY = height / 2;
             int offsetX = width / 2;
 
@@ -149,17 +150,19 @@ namespace Algorithms.Sections
                             int neighborY = y + j;
                             int neighborX = x + i;
 
-                            if (neighborY >= 0 && neighborY < inputImage.Height &&
-                                neighborX >= 0 && neighborX < inputImage.Width)
-                            {
-                                Bgr currentPixel = inputImage[neighborY, neighborX];
-                                double currentNorm = GetNormL2(currentPixel);
+                            if (neighborY < 0) neighborY = 0;
+                            if (neighborY >= inputImage.Height) neighborY = inputImage.Height - 1;
 
-                                if (currentNorm > maxNorm)
-                                {
-                                    maxNorm = currentNorm;
-                                    maxPixel = currentPixel;
-                                }
+                            if (neighborX < 0) neighborX = 0;
+                            if (neighborX >= inputImage.Width) neighborX = inputImage.Width - 1;
+
+                            Bgr currentPixel = inputImage[neighborY, neighborX];
+                            double currentNorm = GetNormL2(currentPixel);
+
+                            if (currentNorm > maxNorm)
+                            {
+                                maxNorm = currentNorm;
+                                maxPixel = currentPixel;
                             }
                         }
                     }
@@ -172,6 +175,7 @@ namespace Algorithms.Sections
         public static Image<Bgr, byte> ColorErosion(Image<Bgr, byte> inputImage, int height, int width)
         {
             Image<Bgr, byte> result = new Image<Bgr, byte>(inputImage.Size);
+
             int offsetY = height / 2;
             int offsetX = width / 2;
 
@@ -189,17 +193,19 @@ namespace Algorithms.Sections
                             int neighborY = y + j;
                             int neighborX = x + i;
 
-                            if (neighborY >= 0 && neighborY < inputImage.Height &&
-                                neighborX >= 0 && neighborX < inputImage.Width)
-                            {
-                                Bgr currentPixel = inputImage[neighborY, neighborX];
-                                double currentNorm = GetNormL2(currentPixel);
+                            if (neighborY < 0) neighborY = 0;
+                            if (neighborY >= inputImage.Height) neighborY = inputImage.Height - 1;
 
-                                if (currentNorm < minNorm)
-                                {
-                                    minNorm = currentNorm;
-                                    minPixel = currentPixel;
-                                }
+                            if (neighborX < 0) neighborX = 0;
+                            if (neighborX >= inputImage.Width) neighborX = inputImage.Width - 1;
+
+                            Bgr currentPixel = inputImage[neighborY, neighborX];
+                            double currentNorm = GetNormL2(currentPixel);
+
+                            if (currentNorm < minNorm)
+                            {
+                                minNorm = currentNorm;
+                                minPixel = currentPixel;
                             }
                         }
                     }
@@ -208,7 +214,6 @@ namespace Algorithms.Sections
             }
             return result;
         }
-
         public static Image<Bgr, byte> ColorOpening(Image<Bgr, byte> colorInitialImage, int height, int width)
         {
             Image<Bgr, byte> eroded = ColorErosion(colorInitialImage, height, width);
