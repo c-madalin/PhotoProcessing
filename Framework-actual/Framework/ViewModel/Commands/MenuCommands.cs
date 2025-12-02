@@ -1298,8 +1298,126 @@ namespace Framework.ViewModel
         }
         #endregion
 
-        
-#endregion
+        #region ColorOpening
+
+        private ICommand _colorOpeningCommand;
+        public ICommand ColorOpeningCommand
+        {
+            get
+            {
+                if (_colorOpeningCommand == null)
+                    _colorOpeningCommand = new RelayCommand(ColorOpening);
+                return _colorOpeningCommand;
+            }
+        }
+
+        private void ColorOpening(object parameter)
+        {
+            if (InitialImage == null) return;
+
+            List<string> options = new List<string> { "h", "w" };
+            DialogWindow window = new DialogWindow(_mainVM, options);
+            window.ShowDialog();
+            var values = window.GetValues();
+
+            //GrayProcessedImage = MorphologicalOperations.Opening(GrayInitialImage, (int)values[0], (int)values[1], (int)values[2], (int)values[3] != 0);
+            //ProcessedImage = Convert(GrayProcessedImage);
+
+            ColorProcessedImage =MorphologicalOperations.ColorOpening(ColorInitialImage, (int)values[0], (int)values[1]);
+            ProcessedImage = Convert(ColorProcessedImage);
+        }
+
+
+        #endregion
+
+        #region ColorErosion
+        private ICommand _colorErosionCommand;
+        public ICommand ColorErosionCommand
+        {
+            get
+            {
+                if (_colorErosionCommand == null)
+                    _colorErosionCommand = new RelayCommand(ColorErosion);
+                return _colorErosionCommand;
+            }
+        }
+
+        private void ColorErosion(object parameter)
+        {
+            if (InitialImage == null) return;
+
+            List<string> options = new List<string> { "h", "w" };
+            DialogWindow window = new DialogWindow(_mainVM, options);
+            window.ShowDialog();
+            var values = window.GetValues();
+
+ 
+
+            ColorProcessedImage = MorphologicalOperations.ColorErosion(ColorInitialImage, (int)values[0], (int)values[1]);
+            ProcessedImage = Convert(ColorProcessedImage);
+
+        }
+        #endregion
+
+        #region ColorDilation
+
+        private ICommand _colorDilatationCommand;
+        public ICommand ColorDilatationCommand
+        {
+            get
+            {
+                if (_colorDilatationCommand == null)
+                    _colorDilatationCommand = new RelayCommand(ColorDilatation);
+                return _colorDilatationCommand;
+            }
+        }
+
+        private void ColorDilatation(object parameter)
+        {
+            if (InitialImage == null) return;
+
+            List<string> options = new List<string> { "h", "w" };
+            DialogWindow window = new DialogWindow(_mainVM, options);
+            window.ShowDialog();
+            var values = window.GetValues();
+
+
+
+            ColorProcessedImage = MorphologicalOperations.ColorDilation(ColorInitialImage, (int)values[0], (int)values[1]);
+            ProcessedImage = Convert(ColorProcessedImage);
+
+        }
+
+
+        #endregion
+        #region ColorClosing
+        private ICommand _colorClosingCommand;
+        public ICommand ColorClosingCommand
+        {
+            get
+            {
+                if (_colorClosingCommand == null)
+                    _colorClosingCommand = new RelayCommand(ColorClosing);
+                return _colorClosingCommand;
+            }
+        }
+
+        private void ColorClosing(object parameter)
+        {
+            if (InitialImage == null) return;
+
+            List<string> options = new List<string> { "h", "w", };
+            DialogWindow window = new DialogWindow(_mainVM, options);
+            window.ShowDialog();
+            var values = window.GetValues();
+
+            ColorProcessedImage = MorphologicalOperations.ColorClosing(ColorInitialImage, (int)values[0], (int)values[1]);
+            ProcessedImage = Convert(ColorProcessedImage);
+        }
+
+        #endregion
+
+        #endregion
 
         #region Geometric transformations
         #endregion
