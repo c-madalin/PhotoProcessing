@@ -1420,6 +1420,64 @@ namespace Framework.ViewModel
         #endregion
 
         #region Geometric transformations
+
+        #region BiliniarInterpolation
+
+        private ICommand _biliniarInterpolationCommand;
+        public ICommand BiliniarInterpolationCommand
+        {
+            get
+            {
+                if (_biliniarInterpolationCommand == null)
+                    _biliniarInterpolationCommand = new RelayCommand(BiliniarInterpolation);
+                return _biliniarInterpolationCommand;
+            }
+        }
+
+        private void BiliniarInterpolation(object parameter)
+        {
+            if (InitialImage == null) return;
+
+            List<string> options = new List<string> { "h", "w" };
+            DialogWindow window = new DialogWindow(_mainVM, options);
+            window.ShowDialog();
+            var values = window.GetValues();
+
+            GrayProcessedImage = GeometricTransformations.InterpolateBilin(GrayInitialImage, (int)values[0], (int)values[1]);
+            ProcessedImage = Convert(GrayProcessedImage);
+        }
+
+
+        #endregion
+
+        #region Bicubic Interpolation
+
+        private ICommand _bicubicInterpolationCommand;
+        public ICommand BicubicInterpolationCommand
+        {
+            get
+            {
+                if (_bicubicInterpolationCommand == null)
+                    _bicubicInterpolationCommand = new RelayCommand(BicubicInterpolation);
+                return _bicubicInterpolationCommand;
+            }
+        }
+
+        private void BicubicInterpolation(object parameter)
+        {
+            if (InitialImage == null) return;
+
+            List<string> options = new List<string> { "h", "w" };
+            DialogWindow window = new DialogWindow(_mainVM, options);
+            window.ShowDialog();
+            var values = window.GetValues();
+
+            GrayProcessedImage = GeometricTransformations.InterpolateBicubic(GrayInitialImage, (int)values[0], (int)values[1]);
+            ProcessedImage = Convert(GrayProcessedImage);
+        }
+
+
+        #endregion
         #endregion
 
         #region Segmentation
