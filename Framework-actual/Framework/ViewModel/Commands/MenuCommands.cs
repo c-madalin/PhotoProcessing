@@ -1481,6 +1481,38 @@ namespace Framework.ViewModel
         #endregion
 
         #region Segmentation
+
+        #region Hiugh Lines Transform
+        private ICommand _houghLinesTransformCommand;
+        public ICommand HoughLinesTransformCommand
+        {
+            get
+            {
+                if (_houghLinesTransformCommand == null)
+                    _houghLinesTransformCommand = new RelayCommand(HoughLinesTransform);
+                return _houghLinesTransformCommand;
+            }
+        }
+        private void HoughLinesTransform(object parameter)
+        {
+            if (InitialImage == null)
+            {
+                MessageBox.Show("Please add an image!");
+                return;
+            }
+            if (InitialImage == null) return;
+
+            List<string> options = new List<string> { "Treshold", };
+            DialogWindow window = new DialogWindow(_mainVM, options);
+            window.ShowDialog();
+            var values = window.GetValues();
+
+            GrayProcessedImage = Segmentation.Hough(GrayInitialImage, (int)values[0]);
+            ProcessedImage = Convert(GrayProcessedImage);
+        }
+
+
+        #endregion
         #endregion
 
         #region Use processed image as initial image
