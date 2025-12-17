@@ -1,24 +1,22 @@
-﻿using Emgu.CV;
+﻿using Algorithms.Sections;
+using Algorithms.Tools;
+using Algorithms.Utilities;
+using Emgu.CV;
 using Emgu.CV.Structure;
-
-using System.Windows;
+using Framework.View;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Controls;
-using System.Collections.Generic;
-
-using Framework.View;
+using static Framework.Converters.ImageConverter;
 using static Framework.Utilities.DataProvider;
 using static Framework.Utilities.DrawingHelper;
 using static Framework.Utilities.FileHelper;
-using static Framework.Converters.ImageConverter;
-
-using Algorithms.Sections;
-using Algorithms.Tools;
-using Algorithms.Utilities;
-using System.Linq;
 
 namespace Framework.ViewModel
 {
@@ -1484,7 +1482,7 @@ namespace Framework.ViewModel
 
         #region Hiugh Lines Transform
         private ICommand _houghLinesTransformCommand;
-        public ICommand HoughLinesTransformCommand
+        public ICommand HoughCommand
         {
             get
             {
@@ -1500,17 +1498,41 @@ namespace Framework.ViewModel
                 MessageBox.Show("Please add an image!");
                 return;
             }
-            if (InitialImage == null) return;
 
-            List<string> options = new List<string> { "Treshold", };
+            List<string> options = new List<string> { "Threshold (Binarizare)" };
             DialogWindow window = new DialogWindow(_mainVM, options);
             window.ShowDialog();
             var values = window.GetValues();
 
-            GrayProcessedImage = Segmentation.Hough(GrayInitialImage, (int)values[0]);
-            ProcessedImage = Convert(GrayProcessedImage);
-        }
+            if (values == null || values.Count == 0) return;
 
+            int sobelThreshold = (int)values[0];
+
+            var edges = Segmentation.SobelNonDirectional(GrayInitialImage, sobelThreshold);
+
+            int[,] houghMatrix = Segmentation.BuildHough(edges);
+
+            GrayProcessedImage = Segmentation.DisplayHough(houghMatrix);
+            ProcessedImage = Convert(GrayProcessedImage);
+
+            int maxVote = 0;
+            foreach (int val in houghMatrix) if (val > maxVote) maxVote = val;
+            int houghThreshold = (int)(maxVote * 0.5);
+
+            var localMaxima = Segmentation.FindLocalMaxima(houghMatrix, houghThreshold, 5); 
+
+            int rhoMax = (int)Math.Sqrt(GrayInitialImage.Height * GrayInitialImage.Height + GrayInitialImage.Width * GrayInitialImage.Width);
+
+            Image<Bgr, byte> imageWithLines;
+            if (ColorInitialImage != null)
+                imageWithLines = ColorInitialImage.Copy();
+            else
+                imageWithLines = GrayInitialImage.Convert<Bgr, byte>();
+
+            Segmentation.DrawLinesFromMaxima(imageWithLines, localMaxima, rhoMax);
+
+            InitialImage = Convert(imageWithLines);
+        }
 
         #endregion
         #endregion

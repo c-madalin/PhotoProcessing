@@ -1,151 +1,153 @@
 ﻿using Emgu.CV;
 using Emgu.CV.Structure;
 using System;
-using System.Drawing; // Necesar pentru Point, dacă folosim structuri grafice, sau doar Math
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace Algorithms.Sections
 {
     public class Segmentation
     {
-        // Funcția principală apelată din ViewModel
-        public static Image<Gray, byte> Hough(Image<Gray, byte> inputColor, int threshold)
+        public static Image<Gray, byte> SobelNonDirectional(Image<Gray, byte> image, double threshold)
         {
-            // 1. Conversie Bgr -> Gray
-            Image<Gray, byte> grayImage = inputColor.Convert<Gray, byte>();
-            int width = grayImage.Width;
-            int height = grayImage.Height;
+            float[,] Sx = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
+            float[,] Sy = { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
 
-            // 2. Detectarea Marginilor (Sobel Manual pentru a obține o imagine binară de contur)
-            // Folosim o matrice bool pentru viteză internă, sau putem face un Image<Gray, byte> temporar
-            bool[,] edges = new bool[height, width];
-            int edgeThreshold = 100; // Prag pentru Sobel
+            int w = image.Width;
+            int h = image.Height;
 
-            // Kernel-uri Sobel
-            int[,] gx = new int[,] { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
-            int[,] gy = new int[,] { { -1, -2, -1 }, { 0, 0, 0 }, { 1, 2, 1 } };
+            Image<Gray, byte> result = image.CopyBlank();
 
-            for (int y = 1; y < height - 1; y++)
+            for (int y = 1; y < h - 1; y++)
             {
-                for (int x = 1; x < width - 1; x++)
+                for (int x = 1; x < w - 1; x++)
                 {
-                    int sumX = 0;
-                    int sumY = 0;
+                    float gx = 0, gy = 0;
 
-                    // Aplicăm Kernel 3x3
                     for (int i = -1; i <= 1; i++)
                     {
                         for (int j = -1; j <= 1; j++)
                         {
-                            // Accesăm pixelii imaginii Gray
-                            int val = grayImage.Data[y + i, x + j, 0];
-                            sumX += val * gx[i + 1, j + 1];
-                            sumY += val * gy[i + 1, j + 1];
+                            byte p = image.Data[y + i, x + j, 0];
+                            gx += Sx[i + 1, j + 1] * p;
+                            gy += Sy[i + 1, j + 1] * p;
                         }
                     }
 
-                    int magnitude = (int)Math.Sqrt(sumX * sumX + sumY * sumY);
-                    if (magnitude > edgeThreshold)
-                    {
-                        edges[y, x] = true;
-                    }
+                    double mag = Math.Sqrt(gx * gx + gy * gy);
+                    result.Data[y, x, 0] = (byte)(mag > threshold ? 255 : 0);
                 }
             }
-
-            // 3. Transformata Hough (Acumulator)
-            int maxRho = (int)Math.Sqrt(width * width + height * height);
-            int rhoDim = 2 * maxRho;
-            int thetaDim = 180;
-            int[,] accumulator = new int[rhoDim, thetaDim];
-
-            // Tabele de sin/cos precalculate
-            double[] sinTable = new double[thetaDim];
-            double[] cosTable = new double[thetaDim];
-            for (int t = 0; t < thetaDim; t++)
-            {
-                double rad = (t * Math.PI) / 180.0;
-                sinTable[t] = Math.Sin(rad);
-                cosTable[t] = Math.Cos(rad);
-            }
-
-            // Votarea în acumulator
-            for (int y = 0; y < height; y++)
-            {
-                for (int x = 0; x < width; x++)
-                {
-                    if (edges[y, x]) // Dacă este punct de margine
-                    {
-                        for (int t = 0; t < thetaDim; t++)
-                        {
-                            int rho = (int)(x * cosTable[t] + y * sinTable[t]);
-                            accumulator[rho + maxRho, t]++;
-                        }
-                    }
-                }
-            }
-
-            // 4. Desenarea Liniilor
-            // Creăm rezultatul pornind de la imaginea grayscale originală
-            Image<Gray, byte> result = grayImage.Copy();
-
-            // Prag minim de siguranță
-            if (threshold < 10) threshold = 50;
-
-            for (int r = 0; r < rhoDim; r++)
-            {
-                for (int t = 0; t < thetaDim; t++)
-                {
-                    if (accumulator[r, t] >= threshold)
-                    {
-                        // Parametrii liniei
-                        int rho = r - maxRho;
-                        double cos = cosTable[t];
-                        double sin = sinTable[t];
-
-                        // Calculăm coordonate pentru desenare
-                        int x0 = (int)(cos * rho);
-                        int y0 = (int)(sin * rho);
-
-                        // Extindem linia mult în afara ecranului pentru a părea infinită
-                        int hugeLen = Math.Max(width, height) * 2;
-
-                        int x1 = (int)(x0 + hugeLen * (-sin));
-                        int y1 = (int)(y0 + hugeLen * (cos));
-                        int x2 = (int)(x0 - hugeLen * (-sin));
-                        int y2 = (int)(y0 - hugeLen * (cos));
-
-                        // Desenăm linia folosind o funcție helper (stil manual pe Data array)
-                        DrawLineOnData(result, x1, y1, x2, y2);
-                    }
-                }
-            }
-
             return result;
         }
 
-        // Helper pentru desenare linie direct pe matricea de pixeli (Bresenham)
-        // 
-        private static void DrawLineOnData(Image<Gray, byte> img, int x0, int y0, int x1, int y1)
+        public static int[,] BuildHough(Image<Gray, byte> edges)
         {
-            int width = img.Width;
-            int height = img.Height;
+            int h = edges.Height;
+            int w = edges.Width;
+            int rhoMax = (int)Math.Sqrt(h * h + w * w);
+            int thetaMax = 271; 
 
-            int dx = Math.Abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-            int dy = -Math.Abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
-            int err = dx + dy, e2;
+            int[,] H = new int[2 * rhoMax + 1, thetaMax];
 
-            while (true)
+            for (int y = 0; y < h; y++)
             {
-                // Verificăm limitele imaginii (Clipping)
-                if (x0 >= 0 && x0 < width && y0 >= 0 && y0 < height)
+                for (int x = 0; x < w; x++)
                 {
-                    // Setăm pixelul alb (255)
-                    img.Data[y0, x0, 0] = 255;
-                }
+                    if (edges.Data[y, x, 0] == 255) 
+                    {
+                        for (int theta = 0; theta < thetaMax; theta++)
+                        {
+                            double rad = theta * Math.PI / 180.0;
+                            int rho = (int)Math.Round(x * Math.Cos(rad) + y * Math.Sin(rad));
 
-                if (x0 == x1 && y0 == y1) break;
-                e2 = 2 * err;
-                if (e2 >= dy) { err += dy; x0 += sx; }
-                if (e2 <= dx) { err += dx; y0 += sy; }
+                            rho += rhoMax;
+
+                            if (rho >= 0 && rho < 2 * rhoMax + 1)
+                                H[rho, theta]++;
+                        }
+                    }
+                }
+            }
+            return H;
+        }
+
+        public static Image<Gray, byte> DisplayHough(int[,] H)
+        {
+            int r = H.GetLength(0);
+            int t = H.GetLength(1);
+            Image<Gray, byte> img = new Image<Gray, byte>(t, r);
+
+            int max = 1;
+            foreach (int v in H) if (v > max) max = v;
+
+            for (int i = 0; i < r; i++)
+                for (int j = 0; j < t; j++)
+                    img.Data[i, j, 0] = (byte)(255.0 * H[i, j] / max);
+
+            return img;
+        }
+
+        public static List<(int rhoIdx, int theta, int val)> FindLocalMaxima(int[,] H, int threshold, int neighborhoodSize = 5)
+        {
+            var maxima = new List<(int, int, int)>();
+            int rows = H.GetLength(0);
+            int cols = H.GetLength(1);
+            int half = neighborhoodSize / 2;
+
+            for (int r = half; r < rows - half; r++)
+            {
+                for (int t = half; t < cols - half; t++)
+                {
+                    int currentVal = H[r, t];
+                    if (currentVal <= threshold) continue;
+
+                    bool isMax = true;
+                    for (int dr = -half; dr <= half; dr++)
+                    {
+                        for (int dt = -half; dt <= half; dt++)
+                        {
+                            if (dr == 0 && dt == 0) continue;
+                            if (H[r + dr, t + dt] >= currentVal)
+                            {
+                                isMax = false;
+                                break;
+                            }
+                        }
+                        if (!isMax) break;
+                    }
+
+                    if (isMax)
+                        maxima.Add((r, t, currentVal));
+                }
+            }
+            return maxima;
+        }
+
+        public static void DrawLinesFromMaxima(Image<Bgr, byte> image, List<(int rhoIdx, int theta, int val)> maxima, int rhoMaxOffset)
+        {
+            foreach (var item in maxima)
+            {
+                double thetaRad = item.theta * Math.PI / 180.0;
+                double rho = item.rhoIdx - rhoMaxOffset;
+
+                double a = Math.Cos(thetaRad);
+                double b = Math.Sin(thetaRad);
+
+                double x0 = a * rho;
+                double y0 = b * rho;
+
+                Point p1 = new Point(
+                    (int)(x0 + 3000 * (-b)),
+                    (int)(y0 + 3000 * (a))
+                );
+
+                Point p2 = new Point(
+                    (int)(x0 - 3000 * (-b)),
+                    (int)(y0 - 3000 * (a))
+                );
+
+                image.Draw(new LineSegment2D(p1, p2), new Bgr(Color.Red), 2);
             }
         }
     }
